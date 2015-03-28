@@ -10,9 +10,23 @@
       fileInput.after(barContainer);
       fileInput.fileupload({
         add: function(e, data){ 
-          fd['Content-Type'] = data.files[0].type;
-          data.formData = fd
-          data.submit()
+          // filetype & maxfile
+          var uploadErrors = [];
+          var acceptFileTypes = /^image\/(gif|jpe?g|png)$/i;
+          if(data.originalFiles[0]['type'].length && !acceptFileTypes.test(data.originalFiles[0]['type'])) {
+              uploadErrors.push('Not an accepted file type');
+          }
+          if(data.originalFiles[0]['size'] > 1000000) {
+              uploadErrors.push('Filesize is too big');
+          }
+          if(uploadErrors.length > 0) {
+              alert(uploadErrors.join("\n"));
+          } else {
+            // content-type
+            fd['Content-Type'] = data.files[0].type;
+            data.formData = fd
+            // data.submit();
+          }
         },
         fileInput:       fileInput,
         url:             '<%= @s3_direct_post.url %>',
